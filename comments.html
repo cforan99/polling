@@ -1,0 +1,46 @@
+<!doctype html>
+<html>
+<head>
+<title>View Comments with Polling</title>
+</head>
+<body>
+
+<div id="form">
+	<form id="your-comment">
+		<input id="text" type="text" name="text">
+		<input id="submit" type="submit" value="Submit">
+	</form>
+</div>
+<div id="comments"></div>
+
+
+
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>
+<script type="text/javascript">
+// Submit form
+$("#submit").on("click", function(){
+	$.post("http://localhost:5000/submit", { text : $("#text").val() }, function(){
+		$.get("http://localhost:5000/comments", generateList);
+	});
+});
+
+// Get comments
+
+$.get("http://localhost:5000/comments", generateList);
+
+function generateList(data) {
+	// order data from oldest to newest 
+	var orderedComments = {};
+	Object.keys(data).sort().forEach(function(key) {
+		orderedComments[key] = data[key];
+	});
+
+	for (comment in orderedComments) {
+		text = orderedComments[comment];
+		$("#comments").prepend("<div id='"+comment+"'>"+text+"</div>");
+	}
+}
+
+</script>
+</body>
+</html>
