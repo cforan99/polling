@@ -7,6 +7,10 @@ app = Flask(__name__)
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///comments.db'
 db = SQLAlchemy(app)
 
+@app.route("/")
+def show_comments_page():
+	return render_template("comments.html")
+
 
 @app.route("/submit", methods=["POST"])
 def add_comment():
@@ -23,7 +27,23 @@ def add_comment():
 	db.session.execute(QUERY, {'text': text, 'timestamp': timestamp})
 	db.session.commit()
 
-	return
+	QUERY = """
+		SELECT id, comment FROM Comments
+		"""
+
+	db_cursor = db.session.execute(QUERY)
+	rows = db_cursor.fetchall()
+
+	print rows 
+
+	comments = {}
+	for row in rows:
+		number, comment = row
+		comments[number] = comment
+
+	print comments
+
+	return jsonify(comments)
 
 
 @app.route("/comments")
